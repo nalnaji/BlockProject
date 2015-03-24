@@ -1,3 +1,3 @@
-interface Solution{
+interface Strategy{
 	public void solve();
 }
