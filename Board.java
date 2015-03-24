@@ -52,6 +52,19 @@ class Board{
 			return null;
 		}
 	}
+	public boolean isValid(){
+		for(Block currentBlock : this.blocks){
+			//Make sure block has valid boundaries
+			if(!currentBlock.isWithinDimensions(this.height, this.width))
+					return false;
+			//Make sure block doesn't overlap with other blocks	
+			for(Block otherBlock : this.blocks){
+				if(!(currentBlock.equals(otherBlock)) && currentBlock.overlaps(otherBlock))
+					return false;	
+			}
+		}
+		return true;
+	}
 	public ArrayList<Block> getBlocks(){
 		return blocks;
 	}
