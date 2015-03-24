@@ -1,9 +1,10 @@
 class Block{
-	private int height, width, row, col;
 	private Board board;
+	private int id, height, width, row, col;
 
-	public Block(Board board, int height, int width, int row, int col){
+	public Block(Board board, int id, int height, int width, int row, int col){
 		this.board = board;
+		this.id = id;
 		this.height = height;
 		this.width = width;
 		this.row = row;
@@ -11,12 +12,13 @@ class Block{
 	}
 
 	static Block deepCopy(Block b){
-		return new Block (b.board, b.height, b.width, b.row, b.col);
+		return new Block (Board.deepCopy(b.board), b.height, b.width, b.row, b.col);
 	}
 	
 	// Attempts to make a move in a direction
-	// If the move FAILS, returns false
-	public boolean move(String direction){
+	// If the move FAILS, returns null
+	// otherwise returns the new state of the game
+	public Board move(String direction){
 		this.board.getBlocks().remove(this);
 		Block move =  Block.deepCopy(this);
 		switch(direction){
@@ -40,10 +42,10 @@ class Block{
 		if(!this.board.isValid()){
 			this.board.getBlocks().remove(move);
 			this.board.getBlocks().add(this);
-			return false;
+			return null;
 		}
 		else
-			return true;
+			return this.board;
 	}
 	public boolean overlaps(Block other){
 		//establish top-left and bottom-right corners
@@ -70,8 +72,23 @@ class Block{
 			return false;
 		return true;
 	}
+	// Return a list of all the possible board states that
+	// created by moving the current block.
+	public ArrayList<Board> possibleMoves(){
+		String[] moves = {"UP", "DOWN", "LEFT", "RIGHT"};
+		ArrayList<Board> result = new ArrayList<Board>();
+		for(String move : moves){
+			possibleBlock = Block.deepCopy(this);
+			possibleBoard = possibleBlock.move(move);
+			if(possibleBoard != null){
+				result.add(possibleBoard);
+			}
+		}
+		return result;
+	}
 	public int getRow(){return this.row;}
 	public int getCol(){return this.col;}
 	public int getHeight(){return this.height;}
 	public int getWidth(){return this.width;}
+	public int getId(){return this.id;}
 }

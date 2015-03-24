@@ -37,7 +37,7 @@ class Board{
 				int row = Integer.parseInt(read.nextToken());
 				int col = Integer.parseInt(read.nextToken());
 
-				Block newBlock = new Block(this, height, width, row, col);
+				Block newBlock = new Block(this, this.blocks.size(), height, width, row, col);
 				blocks.add(newBlock);
 			}
 		}catch(Exception e){
@@ -64,6 +64,13 @@ class Board{
 			}
 		}
 		return true;
+	}
+	public Block getBlockById(int id){
+		for(Block b : this.blocks){
+			if(b.getId() == id)
+				return b;
+		}
+		return null;
 	}
 	public ArrayList<Block> getBlocks(){
 		return blocks;
