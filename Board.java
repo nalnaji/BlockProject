@@ -52,4 +52,7 @@ class Board{
 			return null;
 		}
 	}
+	public ArrayList<Block> getBlocks(){
+		return blocks;
+	}
 }
