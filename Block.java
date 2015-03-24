@@ -1,3 +1,5 @@
+import java.util.*;
+
 class Block{
 	private Board board;
 	private int id, height, width, row, col;
@@ -12,7 +14,7 @@ class Block{
 	}
 
 	static Block deepCopy(Block b){
-		return new Block (Board.deepCopy(b.board), b.height, b.width, b.row, b.col);
+		return new Block (Board.deepCopy(b.board), b.id, b.height, b.width, b.row, b.col);
 	}
 	
 	// Attempts to make a move in a direction
@@ -78,8 +80,8 @@ class Block{
 		String[] moves = {"UP", "DOWN", "LEFT", "RIGHT"};
 		ArrayList<Board> result = new ArrayList<Board>();
 		for(String move : moves){
-			possibleBlock = Block.deepCopy(this);
-			possibleBoard = possibleBlock.move(move);
+			Block possibleBlock = Block.deepCopy(this);
+			Board possibleBoard = possibleBlock.move(move);
 			if(possibleBoard != null){
 				result.add(possibleBoard);
 			}

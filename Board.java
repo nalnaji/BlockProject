@@ -5,6 +5,11 @@ class Board{
 	private int width, height;
 	private ArrayList<Block> blocks = new ArrayList<Block>();
 
+	public Board(int height, int width, ArrayList<Block> blocks){
+		this.width = width;
+		this.height = height;
+		this.blocks = blocks;
+	}
 	public Board(String file){
 		try{
 			generateDimensions(file);
@@ -12,6 +17,14 @@ class Board{
 		}catch(Exception e){
 			System.out.println("Something went wrong reading input files");
 		}
+	}
+
+	static Board deepCopy(Board b){
+		ArrayList<Block> dcBlocks = new ArrayList<Block>();
+		for(Block block : b.blocks){
+			dcBlocks.add(Block.deepCopy(block));
+		}
+		return new Board(b.height, b.width, dcBlocks);
 	}
   private void generateDimensions(String file){
 		try{
@@ -71,6 +84,15 @@ class Board{
 				return b;
 		}
 		return null;
+	}
+	public ArrayList<Board> getPossibleStates(){
+		ArrayList<Board> result = new ArrayList<Board>();
+		for(Block b : this.blocks){
+			ArrayList<Board> possibleStates = b.possibleMoves();
+			for(Board moves : possibleStates)
+				result.add(moves);
+		}
+		return result;
 	}
 	public ArrayList<Block> getBlocks(){
 		return blocks;
