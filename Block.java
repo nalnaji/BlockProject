@@ -88,6 +88,10 @@ class Block{
 		}
 		return result;
 	}
+	public String toString(){
+		return "block #"+this.id+" row: "+row+" col: "+col+
+			" height: "+this.height+" width: "+this.width;
+	}
 	public int getRow(){return this.row;}
 	public int getCol(){return this.col;}
 	public int getHeight(){return this.height;}

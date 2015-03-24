@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.*;
-
 class Board{
 	private int width, height;
 	private ArrayList<Block> blocks = new ArrayList<Block>();
@@ -93,6 +92,17 @@ class Board{
 				result.add(moves);
 		}
 		return result;
+	}
+	@Override
+	public int hashCode(){
+		return this.toString().hashCode();
+	}
+	public String toString(){
+		String blockInfo = "";
+		for(Block b : this.blocks){
+			blockInfo += b.toString();
+		}
+		return "w: "+this.width + "h: " +this.height+ blockInfo;
 	}
 	public ArrayList<Block> getBlocks(){
 		return blocks;
