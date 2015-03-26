@@ -14,15 +14,23 @@ class Block{
 	}
 
 	static Block deepCopy(Block b){
-		return new Block (Board.deepCopy(b.board), b.id, b.height, b.width, b.row, b.col);
+		Board clone = Board.deepCopy(b.board);
+		return new Block (clone, b.id, b.height, b.width, b.row, b.col);
 	}
-	
+	public boolean matchesWith(Block b){
+		if(this.height == b.height &&
+			  this.width == b.width &&
+				this.row == b.row &&
+				this.col == b.col)
+			return true;
+		return false;
+	}
 	// Attempts to make a move in a direction
 	// If the move FAILS, returns null
 	// otherwise returns the new state of the game
 	public Board move(String direction){
-		this.board.getBlocks().remove(this);
 		Block move =  Block.deepCopy(this);
+		move.board.deleteBlock(move);
 		switch(direction){
 			case "UP":
 				move.row--;
@@ -40,37 +48,45 @@ class Block{
 				throw new IllegalArgumentException("Tried to move in a direction that is"
 																					+ "	not: up, down, left, or right");
 		}
-		this.board.getBlocks().add(move);
-		if(!this.board.isValid()){
-			this.board.getBlocks().remove(move);
-			this.board.getBlocks().add(this);
-			return null;
+		move.board.addBlock(move);
+		if(move.board.isValid()){
+			return move.board;
 		}
 		else
-			return this.board;
+			return null;
 	}
 	public boolean overlaps(Block other){
 		//establish top-left and bottom-right corners
-		int[] l1 = {this.row, this.col};
-		int[] l2 = {this.row+height, this.col+width};
-		int[] r1 = {other.row, other.col};
-		int[] r2 = {other.row+height, other.col+width};
-
+		int[] l1 = {this.row, this.col};							 //0,0
+		int[] r1 = {this.row+this.height-1, this.col+this.width-1};  //0,0
+		int[] l2 = {other.row, other.col};						 //0,1
+		int[] r2 = {other.row+other.height-1, other.col+other.width-1};
+		if (l1[0] <= l2[0] && l1[1]>=l2[1] && r1[0]>=r2[0] && r1[1]<=r2[1])
+			return true;
+		if (l2[0] <= l1[0] && l2[1]>=l1[1] && r2[0]>=r1[0] && r2[1]<=r1[1])
+			return true;
+		if(Arrays.equals(l1, l2) || Arrays.equals(l1, r2) ||
+				Arrays.equals(r1, l2) || Arrays.equals(r1, r2))
+			return true;
+		int b1Top = this.row; //3
+		int b1Bottom = this.row + this.height-1; //3
+		int b1Left = this.col; //3
+		int b1Right = this.col + this.width-1; //3
+		int b2Top = other.row; //3
+		int b2Bottom = other.row + other.height-1; //4
+		int b2Left = other.col; //2
+		int b2Right = other.col + other.width-1; //3
 		//above or below each other
-		if(l1[0] > r2[0] || l2[0] < r1[0])
-			return false;
-		//side-by-side
-		if(l1[1] > r2[1] || l2[1] < r1[1])
+		if((b1Bottom < b2Top)||(b1Top > b2Bottom)||(b1Left > b2Right)||(b1Right < b2Left))
 			return false;
 		return true;
 	}
 	public boolean isWithinDimensions(int height, int width){
 		int[] l1 = {this.row, this.col};
-		int[] l2 = {this.row+height, this.col+width};
-		
+		int[] l2 = {this.row+this.height-1, this.col+this.width-1};
 		if(l1[0] < 0 || l1[1] < 0)
 			return false;
-		if(l2[0] > height-1 || l2[1] > width)
+		if(l2[0] > this.board.getHeight()-1 || l2[1] > this.board.getWidth()-1)
 			return false;
 		return true;
 	}
