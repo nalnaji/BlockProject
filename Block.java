@@ -1,6 +1,6 @@
 import java.util.*;
 
-class Block{
+class Block implements Comparable{
 	private Board board;
 	private int id, height, width, row, col;
 
@@ -103,6 +103,14 @@ class Block{
 			}
 		}
 		return result;
+	}
+	public int compareTo(Object obj){
+		Block o = (Block)(obj);
+		if(this.id < o.id)
+			return -1;
+		if(this.id == o.id)
+			return 0;
+		return 1;
 	}
 	public String toString(){
 		return "block #"+this.id+" row: "+row+" col: "+col+

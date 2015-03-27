@@ -2,9 +2,9 @@ import java.io.*;
 import java.util.*;
 class Board{
 	private int width, height;
-	private ArrayList<Block> blocks = new ArrayList<Block>();
+	private TreeSet<Block> blocks = new TreeSet<Block>();
 
-	public Board(int height, int width, ArrayList<Block> blocks){
+	public Board(int height, int width, TreeSet<Block> blocks){
 		this.width = width;
 		this.height = height;
 		this.blocks = blocks;
@@ -22,7 +22,7 @@ class Board{
 	}
 
 	static Board deepCopy(Board b){
-		ArrayList<Block> dcBlocks = new ArrayList<Block>();
+		TreeSet<Block> dcBlocks = new TreeSet<Block>();
 		Board clone = new Board(b.height, b.width, dcBlocks);
 		for(Block bl : b.blocks){
 			clone.blocks.add(new Block(clone, bl.getId(), bl.getHeight(), bl.getWidth(), bl.getRow(), bl.getCol()));
@@ -131,34 +131,39 @@ class Board{
 	public String toString(){
 		String blockInfo = "";
 		for(Block b : this.blocks){
-			blockInfo += b.toString();
+			blockInfo += b.toString() + "\n";
 		}
 		return "w: "+this.width + "h: " +this.height+ blockInfo;
 	}
-	public ArrayList<Block> getBlocks(){
+	public TreeSet<Block> getBlocks(){
 		return blocks;
 	}
 	static void printMove(Board b1, Board b2){
 		String msg = "No move made.";
 		for(Block bl1 : b1.blocks){
 			for(Block bl2 : b2.blocks){
-				if(bl1.getRow() > bl2.getRow()){
-					msg = "Moved block " + bl1.getId() + " down.";
-				} else if(bl1.getRow() < bl2.getRow()){
-					msg = "Moved block " + bl1.getId() + " up.";
-				} else if(bl1.getCol() > bl2.getCol()){
-					msg = "Moved block " + bl1.getId() + " to the left.";
-				} else if(bl1.getCol() < bl2.getCol()){
-					msg = "Moved block " + bl1.getId() + " to the right.";
+				if(bl1.getId() == bl2.getId()){
+					if(bl1.getRow() < bl2.getRow()){
+						msg = "Moved block " + bl1.getId() + " down.";
+					} else if(bl1.getRow() > bl2.getRow()){
+						msg = "Moved block " + bl1.getId() + " up.";
+					} else if(bl1.getCol() > bl2.getCol()){
+						msg = "Moved block " + bl1.getId() + " to the left.";
+					} else if(bl1.getCol() < bl2.getCol()){
+						msg = "Moved block " + bl1.getId() + " to the right.";
+					}
 				}
 			}
 		}
 		System.out.println(msg);
 	}
 	public void deleteBlock(Block b){
-		for(int i=0; i < this.blocks.size(); i++) 
-			if(this.blocks.get(i).getId() == b.getId())
-				this.blocks.remove(i);
+		Block target = null;
+		for( Block block : this.blocks) 
+			if(block.getId() == b.getId())
+				target = block;
+		if(target != null)
+			this.blocks.remove(target);
 	}
 	public void addBlock(Block b){
 		this.blocks.add(b);
