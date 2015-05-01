@@ -12,7 +12,20 @@ class Board{
 	public Board(String file){
 		try{
 			generateDimensions(file);
-			generateBlocks(file);
+			generateBlocks(file, false);
+			if(!(this.isValid())){
+				throw new IllegalArgumentException("Generation is invalid...");
+			} 
+		}catch(Exception e){
+			System.out.println(e);
+		}
+	}
+
+	public Board(String file, int height, int width){
+		try{
+			this.height = height;
+                        this.width = width;
+			generateBlocks(file, true);
 			if(!(this.isValid())){
 				throw new IllegalArgumentException("Generation is invalid...");
 			} 
@@ -37,16 +50,18 @@ class Board{
 			read = new StringTokenizer(line);
 			this.height = Integer.parseInt(read.nextToken());
 			this.width = Integer.parseInt(read.nextToken());
-			System.out.println("Found dimensions of h= " + this.height + " and w= " +this.width);
+			Debugger.log("Found dimensions of h= " + this.height + " and w= " +this.width);
 		}catch(Exception e){
 			System.out.println("Something went wrong generating the boards dimensions");
 		}
 	}
-	private void generateBlocks(String file){
+	private void generateBlocks(String file, boolean withoutDimensions){
 		try{
 			BufferedReader input = openFile(file);
 			StringTokenizer read;
-			String line = input.readLine();
+                        String line;
+                        if(!withoutDimensions)
+                            line = input.readLine();
 			while ((line = input.readLine()) != null) {
 				read = new StringTokenizer(line);
 				int height = Integer.parseInt(read.nextToken());
@@ -56,7 +71,7 @@ class Board{
 				Block newBlock = new Block(this, this.blocks.size()+1, height, width, row, col);
 				blocks.add(newBlock);
 			}
-			System.out.println("Generated "+this.blocks.size()+ " blocks");
+			Debugger.log("Generated "+this.blocks.size()+ " blocks");
 		}catch(Exception e){
 			System.out.println("Something went wrong generating the blocks on the board");
 		}
@@ -69,17 +84,33 @@ class Board{
 			return null;
 		}
 	}
+	public boolean isValidMove(int blockID){
+                Block currentBlock = this.getBlock(blockID);
+                //Make sure block has valid boundaries
+                if(!currentBlock.isWithinDimensions(this.height, this.width)){
+                          //Debugger.log("ERROR: Block #"+currentBlock.getId()+ " has the wrong dimensions");
+                                return false;
+                }
+                //Make sure block doesn't overlap with other blocks	
+                for(Block otherBlock : this.blocks){
+                        if(!(currentBlock.equals(otherBlock)) && currentBlock.overlaps(otherBlock)){
+                                //Debugger.log("ERROR: Block #"+currentBlock.getId()+ " and #"+otherBlock.getId()+" overlap!");
+                                return false;
+                        }
+                }
+		return true;
+	}
 	public boolean isValid(){
 		for(Block currentBlock : this.blocks){
 			//Make sure block has valid boundaries
 			if(!currentBlock.isWithinDimensions(this.height, this.width)){
-					//System.out.println("ERROR: Block #"+currentBlock.getId()+ " has the wrong dimensions");
+				  //Debugger.log("ERROR: Block #"+currentBlock.getId()+ " has the wrong dimensions");
 					return false;
 			}
 			//Make sure block doesn't overlap with other blocks	
 			for(Block otherBlock : this.blocks){
 				if(!(currentBlock.equals(otherBlock)) && currentBlock.overlaps(otherBlock)){
-					//System.out.println("ERROR: Block #"+currentBlock.getId()+ " and #"+otherBlock.getId()+" overlap!");
+					//Debugger.log("ERROR: Block #"+currentBlock.getId()+ " and #"+otherBlock.getId()+" overlap!");
 					return false;
 				}
 			}
@@ -138,13 +169,13 @@ class Board{
 	public TreeSet<Block> getBlocks(){
 		return blocks;
 	}
-	static void printMove(Board b1, Board b2){
-		String msg = "No move made.";
+	static void prettyPrintMove(Board b1, Board b2){
+                String msg = "No move made";
 		for(Block bl1 : b1.blocks){
 			for(Block bl2 : b2.blocks){
-				if(bl1.getId() == bl2.getId()){
+				if((bl1.getId() == bl2.getId()) && !(bl1.matchesWith(bl2))){
 					if(bl1.getRow() < bl2.getRow()){
-						msg = "Moved block " + bl1.getId() + " down.";
+					        msg = "Moved block " + bl1.getId() + " down.";
 					} else if(bl1.getRow() > bl2.getRow()){
 						msg = "Moved block " + bl1.getId() + " up.";
 					} else if(bl1.getCol() > bl2.getCol()){
@@ -152,6 +183,27 @@ class Board{
 					} else if(bl1.getCol() < bl2.getCol()){
 						msg = "Moved block " + bl1.getId() + " to the right.";
 					}
+				}
+			}
+		}
+		System.out.println(msg);
+	}
+	static void printMove(Board b1, Board b2){
+                String msg = "No move made";
+		for(Block bl1 : b1.blocks){
+			for(Block bl2 : b2.blocks){
+				if((bl1.getId() == bl2.getId()) && !(bl1.matchesWith(bl2))){
+                                        msg = bl1.getRow()+" "+bl1.getCol()+" ";
+                                        msg += bl2.getRow()+" "+bl2.getCol();
+					//if(bl1.getRow() < bl2.getRow()){
+					//        msg = "Moved block " + bl1.getId() + " down.";
+					//} else if(bl1.getRow() > bl2.getRow()){
+					//	msg = "Moved block " + bl1.getId() + " up.";
+					//} else if(bl1.getCol() > bl2.getCol()){
+					//	msg = "Moved block " + bl1.getId() + " to the left.";
+					//} else if(bl1.getCol() < bl2.getCol()){
+					//	msg = "Moved block " + bl1.getId() + " to the right.";
+					//}
 				}
 			}
 		}
@@ -174,4 +226,11 @@ class Board{
 	public int getWidth(){
 		return this.width;
 	}
+        public Block getBlock(int id){
+            for(Block b : this.blocks){
+                if(b.getId() == id)
+                    return b;
+            }
+            return null;
+        }
 }

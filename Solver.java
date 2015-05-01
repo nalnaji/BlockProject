@@ -1,15 +1,18 @@
 public class Solver {
-	public static void main(String[] args){
-		 String pathToStartFile = args[0];
-		 String pathToGoalFile = args[1];
+  public static void main(String[] args){
+     int argIndex = 0;
+     if(args[0].equals( "-oinfo" )) {
+       Debugger.toggleState();
+       argIndex++;
+     }
+     String pathToStartFile = args[argIndex];
+     String pathToGoalFile = args[argIndex+1];
 
-		 Board start = new Board(pathToStartFile);
-		 Board goal = new Board(pathToGoalFile);
-		 Strategy solver = new BFSStrategy(start, goal);
-		 long startTime = System.currentTimeMillis();
-		 solver.solve();
-		 long endTime = System.currentTimeMillis();
-		 long resultTime = endTime - startTime;
-		 System.out.println("It took: " + resultTime + " ms");
-	}
+     Board start = new Board(pathToStartFile);
+     Board goal = new Board(pathToGoalFile, start.getHeight(), start.getWidth());
+     Strategy solver = new BFSStrategy(start, goal);
+     if(!solver.solve()){
+         System.exit(1);
+     }
+  }
 }

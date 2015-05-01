@@ -1,3 +1,3 @@
 interface Strategy{
-	public void solve();
+	public boolean solve();
 }
